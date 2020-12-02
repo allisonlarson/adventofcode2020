@@ -26,8 +26,7 @@ func Compute(r io.Reader, isPart2 bool) (int, error) {
 		pw := input[2]
 
 		if isPart2 {
-			chars := strings.Split(pw, "")
-			if (chars[first-1] == val) != (chars[second-1] == val) {
+			if (string(pw[first-1]) == val) != (string(pw[second-1]) == val) {
 				result += 1
 			}
 		} else {
