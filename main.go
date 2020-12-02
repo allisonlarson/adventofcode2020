@@ -9,18 +9,17 @@ import (
 	"os"
 )
 
-type DayRunner interface {
-	Compute() (int, error)
-}
+type ComputeFn func(io.Reader, bool) (int, error)
 
-func getDayRunner(dayOption string, file io.Reader, args []string) (DayRunner, error) {
+func getDayRunner(dayOption string) (ComputeFn, error) {
 	switch dayOption {
 	case "day1":
-		return day1.NewDay1(file, os.Args[3:])
+		return day1.Compute, nil
 	case "day2":
-		return day2.NewDay(file, os.Args[3:])
+		return day2.Compute, nil
+	default:
+		return nil, errors.New("Invalid option specified")
 	}
-	return nil, errors.New("Invalid option specified")
 }
 
 func main() {
@@ -30,13 +29,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	runPartTwo := (len(os.Args[3:]) != 0) && (os.Args[3] == "part2")
 
-	dayRunner, err := getDayRunner(day, file, os.Args[3:])
+	computeFn, err := getDayRunner(day)
 	if err != nil {
 		panic(err)
 	}
 
-	answer, err := dayRunner.Compute()
+	answer, err := computeFn(file, runPartTwo)
 	if err != nil {
 		panic(err)
 	}

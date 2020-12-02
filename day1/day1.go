@@ -6,27 +6,16 @@ import (
 	"io"
 )
 
-type Day1 struct {
-	inputs []int
-	args   []string
-}
-
-func NewDay1(file io.Reader, args []string) (*Day1, error) {
-	input, err := util.ParseInts(file)
+func Compute(r io.Reader, isPartTwo bool) (int, error) {
+	input, err := util.ParseInts(r)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	return &Day1{
-		inputs: input,
-		args:   args,
-	}, nil
-}
 
-func (d *Day1) Compute() (int, error) {
-	for i, num := range d.inputs {
-		for _, num2 := range d.inputs[i+1:] {
-			if len(d.args) != 0 && d.args[0] == "part2" {
-				for _, num3 := range d.inputs[i+1:] {
+	for i, num := range input {
+		for _, num2 := range input[i+1:] {
+			if isPartTwo {
+				for _, num3 := range input[i+1:] {
 					if num+num2+num3 == 2020 {
 						return num * num2 * num3, nil
 					}

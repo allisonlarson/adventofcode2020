@@ -9,26 +9,21 @@ func TestCompute(t *testing.T) {
 	rawInput := "1-3 a: abcde\n1-3 b: cdefg\n2-9 c: ccccccccc"
 
 	testCases := []struct{
-		arg string
+		runPartTwo bool
 		answer int
 	}{
 		{
-			arg: "part1",
 			answer: 2,
 		},
 		{
-			arg: "part2",
+			runPartTwo: true,
 			answer: 1,
 		},
 	}
 
 	for _, testCase := range testCases {
 		input := strings.NewReader(rawInput)
-		day2, err := NewDay(input, []string{testCase.arg})
-		if err !=nil {
-			t.Error(err)
-		}
-		answer,err := day2.Compute()
+		answer,err := Compute(input, testCase.runPartTwo)
 		if err !=nil {
 			t.Error(err)
 		}
