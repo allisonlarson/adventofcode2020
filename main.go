@@ -2,6 +2,7 @@ package main
 
 import (
 	"aoc/day1"
+	"aoc/day2"
 	"errors"
 	"fmt"
 	"io"
@@ -16,6 +17,8 @@ func getDayRunner(dayOption string, file io.Reader, args []string) (DayRunner, e
 	switch dayOption {
 	case "day1":
 		return day1.NewDay1(file, os.Args[3:])
+	case "day2":
+		return day2.NewDay(file, os.Args[3:])
 	}
 	return nil, errors.New("Invalid option specified")
 }
