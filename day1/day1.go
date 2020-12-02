@@ -4,6 +4,7 @@ import (
 	"aoc/util"
 	"fmt"
 	"io"
+	"sort"
 )
 
 type Day1 struct {
@@ -23,6 +24,7 @@ func NewDay1(file io.Reader, args []string) (*Day1, error) {
 }
 
 func (d *Day1) Compute() (int, error) {
+	sort.Ints(d.inputs)
 	for i, num := range d.inputs {
 		for _, num2 := range d.inputs[i+1:] {
 			if len(d.args) != 0 && d.args[0] == "part2" {

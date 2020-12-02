@@ -3,6 +3,7 @@ package day1
 import (
 	"strings"
 	"testing"
+	"os"
 )
 
 func TestCompute(t *testing.T) {
@@ -35,6 +36,24 @@ func TestCompute(t *testing.T) {
 
 		if answer != testCase.answer {
 			t.Errorf("Expected %v, got %v", testCase.answer, answer)
+		}
+	}
+}
+
+func BenchmarkCompute(b *testing.B) {
+	input, err := os.Open("../inputs/day1.txt")
+	if err != nil {
+		panic(err)
+	}
+	day1, err := NewDay1(input, []string{"part1"})
+	if err != nil {
+		b.Error(err)
+	}
+	for i := 0; i <b.N; i++ {
+
+		_, err = day1.Compute()
+		if err != nil {
+			b.Error(err)
 		}
 	}
 }
