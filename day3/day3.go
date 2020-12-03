@@ -9,17 +9,14 @@ type route struct {
 	xSlope   int
 	ySlope   int
 	x        int
-	y        int
 	treesHit int
 }
 
 func newRoute(xSlope, ySlope int) *route {
 	return &route{
-		xSlope:   xSlope,
-		ySlope:   ySlope,
-		x:        xSlope,
-		y:        0,
-		treesHit: 0,
+		xSlope: xSlope,
+		ySlope: ySlope,
+		x:      xSlope,
 	}
 }
 
@@ -34,12 +31,18 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	}
 
 	scanner := bufio.NewScanner(r)
+	i := 0
 	for scanner.Scan() {
+		line := scanner.Text()
 		for _, route := range routes {
-			var treeHit int
-			treeHit, route.x, route.y = processTreeLine(scanner.Text(), route.x, route.y, route.xSlope, route.ySlope)
-			route.treesHit += treeHit
+			if i >= route.ySlope && i%route.ySlope == 0 {
+				if line[route.x%len(line)] == '#' {
+					route.treesHit += 1
+				}
+				route.x += route.xSlope
+			}
 		}
+		i++
 	}
 	if runPartTwo {
 		total := 1
@@ -49,16 +52,4 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 		return total, scanner.Err()
 	}
 	return routes[0].treesHit, scanner.Err()
-}
-
-func processTreeLine(line string, x, y, xSlope, ySlope int) (int, int, int) {
-	treeHit := 0
-	if y >= ySlope && y%ySlope == 0 {
-		if string(line[x%len(line)]) == "#" {
-			treeHit = 1
-		}
-		x += xSlope
-	}
-	y++
-	return treeHit, x, y
 }
