@@ -6,20 +6,20 @@ import (
 )
 
 type route struct {
-	xSlope           int
-	ySlope           int
-	currentXLocation int
-	currentYLocation int
-	treesHit         int
+	xSlope   int
+	ySlope   int
+	x        int
+	y        int
+	treesHit int
 }
 
 func newRoute(xSlope, ySlope int) *route {
 	return &route{
-		xSlope:           xSlope,
-		ySlope:           ySlope,
-		currentXLocation: xSlope,
-		currentYLocation: 0,
-		treesHit:         0,
+		xSlope:   xSlope,
+		ySlope:   ySlope,
+		x:        xSlope,
+		y:        0,
+		treesHit: 0,
 	}
 }
 
@@ -37,7 +37,7 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	for scanner.Scan() {
 		for _, route := range routes {
 			var treeHit bool
-			treeHit, route.currentXLocation, route.currentYLocation = treeLine(scanner.Text(), route.currentYLocation, route.currentXLocation, route.xSlope, route.ySlope)
+			treeHit, route.x, route.y = processTreeLine(scanner.Text(), route.x, route.y, route.xSlope, route.ySlope)
 			if treeHit {
 				route.treesHit++
 			}
@@ -50,21 +50,17 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 		}
 		return total, scanner.Err()
 	}
-
 	return routes[0].treesHit, scanner.Err()
 }
 
-func treeLine(line string, currentYLocation, currentXLocation, xSlope, ySlope int) (bool, int, int) {
+func processTreeLine(line string, x, y, xSlope, ySlope int) (bool, int, int) {
 	treeHit := false
-	if currentYLocation >= ySlope && currentYLocation%ySlope == 0 {
-		if currentXLocation >= len(line) {
-			currentXLocation = currentXLocation - len(line)
-		}
-		if string(line[currentXLocation]) == "#" {
+	if y >= ySlope && y%ySlope == 0 {
+		if string(line[x%len(line)]) == "#" {
 			treeHit = true
 		}
-		currentXLocation += xSlope
+		x += xSlope
 	}
-	currentYLocation++
-	return treeHit, currentXLocation, currentYLocation
+	y++
+	return treeHit, x, y
 }
