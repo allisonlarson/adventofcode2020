@@ -36,11 +36,9 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		for _, route := range routes {
-			var treeHit bool
+			var treeHit int
 			treeHit, route.x, route.y = processTreeLine(scanner.Text(), route.x, route.y, route.xSlope, route.ySlope)
-			if treeHit {
-				route.treesHit++
-			}
+			route.treesHit += treeHit
 		}
 	}
 	if runPartTwo {
@@ -53,11 +51,11 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	return routes[0].treesHit, scanner.Err()
 }
 
-func processTreeLine(line string, x, y, xSlope, ySlope int) (bool, int, int) {
-	treeHit := false
+func processTreeLine(line string, x, y, xSlope, ySlope int) (int, int, int) {
+	treeHit := 0
 	if y >= ySlope && y%ySlope == 0 {
 		if string(line[x%len(line)]) == "#" {
-			treeHit = true
+			treeHit = 1
 		}
 		x += xSlope
 	}
