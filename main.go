@@ -3,6 +3,7 @@ package main
 import (
 	"aoc/day1"
 	"aoc/day2"
+	"aoc/day3"
 	"errors"
 	"fmt"
 	"io"
@@ -17,6 +18,8 @@ func getDayRunner(dayOption string) (ComputeFn, error) {
 		return day1.Compute, nil
 	case "day2":
 		return day2.Compute, nil
+	case "day3":
+		return day3.Compute, nil
 	default:
 		return nil, errors.New("Invalid option specified")
 	}
