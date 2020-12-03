@@ -30,19 +30,24 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 		routes = append(routes, newRoute(1, 2))
 	}
 
+	treeMap := []string{}
 	scanner := bufio.NewScanner(r)
 	i := 0
 	for scanner.Scan() {
-		line := scanner.Text()
-		for _, route := range routes {
+		treeMap = append(treeMap, scanner.Text())
+	}
+	i++
+
+	for _, route := range routes {
+		for i := 0; i < len(treeMap); i += route.ySlope {
 			if i >= route.ySlope && i%route.ySlope == 0 {
-				if line[route.x%len(line)] == '#' {
+				if treeMap[i][route.x%len(treeMap[i])] == '#' {
 					route.treesHit += 1
 				}
 				route.x += route.xSlope
 			}
 		}
-		i++
+
 	}
 	if runPartTwo {
 		total := 1
