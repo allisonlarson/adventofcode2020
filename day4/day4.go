@@ -2,12 +2,25 @@ package day4
 
 import (
 	"io"
+	"regexp"
 	"strings"
 )
 
-var validFields = []string{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}
+type Field struct {
+	name string
+	rule *regexp.Regexp
+}
 
 func Compute(r io.Reader, runPartTwo bool) (int, error) {
+	fields := []Field{}
+	fields = append(fields, Field{name: "byr", rule: regexp.MustCompile(`^[1-2](9|0)([2-9][0-9]|0[1-2])$`)})                   // 1920-2002
+	fields = append(fields, Field{name: "iyr", rule: regexp.MustCompile(`^20(1[0-9]|20)$`)})                                   // 2010-2020
+	fields = append(fields, Field{name: "eyr", rule: regexp.MustCompile(`^20(2[0-9]|30)$`)})                                   // 2020-2030
+	fields = append(fields, Field{name: "hgt", rule: regexp.MustCompile(`^((59|6[0-9]|7[0-6])in)|(1([5-8][0-9]|9[0-3])cm)$`)}) // 59in-76in OR 150cm-193cm
+	fields = append(fields, Field{name: "ecl", rule: regexp.MustCompile(`^(amb|blu|brn|gry|grn|hzl|oth)$`)})                   // colors
+	fields = append(fields, Field{name: "hcl", rule: regexp.MustCompile(`^#[a-f0-9]{6}$`)})                                    // # followed by 6 chars a-f or 0-9
+	fields = append(fields, Field{name: "pid", rule: regexp.MustCompile(`^[0-9]{9}$`)})                                        // 9 digit
+
 	buf := new(strings.Builder)
 	_, err := io.Copy(buf, r)
 	if err != nil {
@@ -17,21 +30,23 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	ps := strings.Split(buf.String(), "\n\n")
 	for _, p := range ps {
 		p = strings.ReplaceAll(p, "\n", " ")
-		p = strings.TrimSpace(p)
 		fs := strings.Split(p, " ")
-		if len(fs) == 8 {
-			validPassports++
-			continue
-		}
 		validFieldCount := 0
 		for _, f := range fs {
-			for _, validField := range validFields {
-				if strings.Contains(f, validField) {
-					validFieldCount++
+			for _, validField := range fields {
+				if runPartTwo {
+					passportField := strings.Split(f, ":")
+					if validField.name == passportField[0] && validField.rule.MatchString(passportField[1]) {
+						validFieldCount++
+					}
+				} else {
+					if strings.Contains(f, validField.name) {
+						validFieldCount++
+					}
 				}
 			}
 		}
-		if validFieldCount >= 7 {
+		if validFieldCount == len(fields) {
 			validPassports++
 		}
 	}
