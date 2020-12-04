@@ -12,14 +12,14 @@ type Field struct {
 }
 
 func Compute(r io.Reader, runPartTwo bool) (int, error) {
-	fields := []Field{}
-	fields = append(fields, Field{name: "byr", rule: regexp.MustCompile(`^[1-2](9|0)([2-9][0-9]|0[1-2])$`)})                   // 1920-2002
-	fields = append(fields, Field{name: "iyr", rule: regexp.MustCompile(`^20(1[0-9]|20)$`)})                                   // 2010-2020
-	fields = append(fields, Field{name: "eyr", rule: regexp.MustCompile(`^20(2[0-9]|30)$`)})                                   // 2020-2030
-	fields = append(fields, Field{name: "hgt", rule: regexp.MustCompile(`^((59|6[0-9]|7[0-6])in)|(1([5-8][0-9]|9[0-3])cm)$`)}) // 59in-76in OR 150cm-193cm
-	fields = append(fields, Field{name: "ecl", rule: regexp.MustCompile(`^(amb|blu|brn|gry|grn|hzl|oth)$`)})                   // colors
-	fields = append(fields, Field{name: "hcl", rule: regexp.MustCompile(`^#[a-f0-9]{6}$`)})                                    // # followed by 6 chars a-f or 0-9
-	fields = append(fields, Field{name: "pid", rule: regexp.MustCompile(`^[0-9]{9}$`)})                                        // 9 digit
+	fields := map[string]*regexp.Regexp{}
+	fields["byr"] = regexp.MustCompile(`^[1-2](9|0)([2-9][0-9]|0[1-2])$`)                   // 1920-2002
+	fields["iyr"] = regexp.MustCompile(`^20(1[0-9]|20)$`)                                   // 2010-2020
+	fields["eyr"] = regexp.MustCompile(`^20(2[0-9]|30)$`)                                   // 2020-2030
+	fields["hgt"] = regexp.MustCompile(`^((59|6[0-9]|7[0-6])in)|(1([5-8][0-9]|9[0-3])cm)$`) // 59in-76in OR 150cm-193cm
+	fields["ecl"] = regexp.MustCompile(`^(amb|blu|brn|gry|grn|hzl|oth)$`)                   // colors
+	fields["hcl"] = regexp.MustCompile(`^#[a-f0-9]{6}$`)                                    // # followed by 6 chars a-f or 0-9
+	fields["pid"] = regexp.MustCompile(`^[0-9]{9}$`)                                        // 9 digit
 
 	buf := new(strings.Builder)
 	_, err := io.Copy(buf, r)
@@ -29,20 +29,17 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	validPassports := 0
 	ps := strings.Split(buf.String(), "\n\n")
 	for _, p := range ps {
-		p = strings.ReplaceAll(p, "\n", " ")
-		fs := strings.Split(p, " ")
+		fs := strings.Split(strings.ReplaceAll(p, "\n", " "), " ")
 		validFieldCount := 0
 		for _, f := range fs {
-			for _, validField := range fields {
+			fieldPair := strings.Split(f, ":")
+			if _, ok := fields[fieldPair[0]]; ok {
 				if runPartTwo {
-					passportField := strings.Split(f, ":")
-					if validField.name == passportField[0] && validField.rule.MatchString(passportField[1]) {
+					if fields[fieldPair[0]].MatchString(fieldPair[1]) {
 						validFieldCount++
 					}
 				} else {
-					if strings.Contains(f, validField.name) {
-						validFieldCount++
-					}
+					validFieldCount++
 				}
 			}
 		}

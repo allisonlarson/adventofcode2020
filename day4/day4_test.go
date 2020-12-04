@@ -1,6 +1,7 @@
 package day4
 
 import (
+	"os"
 	"strings"
 	"testing"
 )
@@ -63,4 +64,31 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719`
 		t.Errorf("Expected 4, got %v", answer)
 	}
 
+}
+func BenchmarkComputePart1(b *testing.B) {
+	file, err := os.Open("../inputs/day4.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, err := Compute(file, false)
+		if err != nil {
+			b.Error(err)
+		}
+	}
+}
+
+func BenchmarkComputePart2(b *testing.B) {
+	file, err := os.Open("../inputs/day4.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	for i := 0; i < b.N; i++ {
+		_, err = Compute(file, true)
+		if err != nil {
+			b.Error(err)
+		}
+	}
 }
