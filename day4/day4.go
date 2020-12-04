@@ -6,11 +6,6 @@ import (
 	"strings"
 )
 
-type Field struct {
-	name string
-	rule *regexp.Regexp
-}
-
 func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	fields := map[string]*regexp.Regexp{}
 	fields["byr"] = regexp.MustCompile(`^[1-2](9|0)([2-9][0-9]|0[1-2])$`)                   // 1920-2002
@@ -26,10 +21,11 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	validPassports := 0
 	ps := strings.Split(buf.String(), "\n\n")
 	for _, p := range ps {
-		fs := strings.Split(strings.ReplaceAll(p, "\n", " "), " ")
+		fs := strings.Fields(p)
 		validFieldCount := 0
 		for _, f := range fs {
 			fieldPair := strings.Split(f, ":")
