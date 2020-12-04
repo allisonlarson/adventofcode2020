@@ -29,14 +29,11 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 		validFieldCount := 0
 		for _, f := range fs {
 			fieldPair := strings.Split(f, ":")
-			if _, ok := fields[fieldPair[0]]; ok {
-				if runPartTwo {
-					if fields[fieldPair[0]].MatchString(fieldPair[1]) {
-						validFieldCount++
-					}
-				} else {
-					validFieldCount++
+			if rule, ok := fields[fieldPair[0]]; ok {
+				if runPartTwo && !rule.MatchString(fieldPair[1]) {
+					continue
 				}
+				validFieldCount++
 			}
 		}
 		if validFieldCount == len(fields) {
