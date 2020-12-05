@@ -10,36 +10,36 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 	seatIds := []int{}
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
-		seats := []int{}
-		rows := []int{}
-		for i := 0; i < 128; i++ {
-			seats = append(seats, i)
+		rows := make([]int, 128)
+		seat := make([]int, 8)
+		for i := range rows {
+			rows[i] = i
 		}
-		for i := 0; i < 8; i++ {
-			rows = append(rows, i)
+		for i := range seat {
+			seat[i] = i
 		}
 
 		pass := scanner.Text()
 		for _, p := range pass {
-			seatChange := len(seats) / 2
+			seatChange := len(seat) / 2
 			rowChange := len(rows) / 2
 
 			if p == 'F' { // Lower half
-				seats = seats[:seatChange]
-			}
-			if p == 'B' { // Higher half
-				seats = seats[seatChange:]
-			}
-			if p == 'L' { // Lower half
 				rows = rows[:rowChange]
 			}
-			if p == 'R' { // Higher half
+			if p == 'B' { // Higher half
 				rows = rows[rowChange:]
+			}
+			if p == 'L' { // Lower half
+				seat = seat[:seatChange]
+			}
+			if p == 'R' { // Higher half
+				seat = seat[seatChange:]
 			}
 
 		}
 
-		seatId := seats[0]*8 + rows[0]
+		seatId := rows[0]*8 + seat[0]
 		seatIds = append(seatIds, seatId)
 	}
 

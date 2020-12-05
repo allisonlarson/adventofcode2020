@@ -15,7 +15,7 @@ func TestComputePart1(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if answer != 821 {
+	if answer != 820 {
 		t.Errorf("Expected 820, got %v", answer)
 	}
 }
