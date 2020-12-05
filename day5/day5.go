@@ -23,7 +23,6 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 		for _, p := range pass {
 			seatChange := len(seat) / 2
 			rowChange := len(rows) / 2
-
 			if p == 'F' { // Lower half
 				rows = rows[:rowChange]
 			}
@@ -36,7 +35,6 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 			if p == 'R' { // Higher half
 				seat = seat[seatChange:]
 			}
-
 		}
 
 		seatId := rows[0]*8 + seat[0]
