@@ -2,7 +2,6 @@ package day5
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"sort"
 )
@@ -46,12 +45,7 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 
 	sort.Ints(seatIds)
 	if runPartTwo {
-		for i := 0; i < len(seatIds)-1; i++ {
-			if seatIds[i+1]-seatIds[i] != 1 {
-				return seatIds[i] + 1, nil
-			}
-		}
-		return 0, fmt.Errorf("Nothing found")
+		return seatIds[sort.Search(len(seatIds), func(i int) bool { return seatIds[i] != seatIds[0]+i })] - 1, nil
 	}
 	return seatIds[len(seatIds)-1], nil
 }
