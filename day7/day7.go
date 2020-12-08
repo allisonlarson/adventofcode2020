@@ -2,14 +2,20 @@ package day7
 
 import (
 	"aoc/util"
-	"fmt"
 	"io"
+	"strconv"
 	"strings"
 )
 
 type Bag struct {
-	color  string
-	within []*Bag
+	color    string
+	within   []*Bag
+	contains []*Bag
+	rules    map[string]int
+}
+
+func NewBag(color string) *Bag {
+	return &Bag{color: color, within: []*Bag{}, rules: map[string]int{}, contains: []*Bag{}}
 }
 
 func Compute(r io.Reader, runPartTwo bool) (int, error) {
@@ -18,63 +24,66 @@ func Compute(r io.Reader, runPartTwo bool) (int, error) {
 		return 0, err
 	}
 	rules := strings.Split(strings.TrimSpace(input), "\n")
-	//lastRule := len(rules) - 1
-	//for i := 0; i < len(rules)/2; i++ {
-	//	rules[i], rules[lastRule-i] = rules[lastRule-i], rules[i]
-	//}
 	bags := map[string]*Bag{}
 	for _, rule := range rules {
 		bagsInRule := strings.Split(rule, " bags contain ")
 		color := strings.TrimSpace(bagsInRule[0])
-		subjectBag, ok := bags[color]
+		_, ok := bags[color]
 		if !ok {
-			subjectBag = &Bag{color: color, within: []*Bag{}}
-			bags[color] = subjectBag
+			bags[color] = NewBag(color)
 		}
+		subjectBag := bags[color]
 		if strings.Contains(rule, "contain no other bags.") {
 			continue
 		}
 		containedBags := strings.Split(strings.NewReplacer("bags", "", "bag", "", ".", "").Replace(bagsInRule[1]), " , ")
 		for _, bag := range containedBags {
-			fmt.Println(bag)
-			//bagCount, err := strconv.Atoi(string(bag[0]))
-			//if err != nil {
-			//	return 0, err
-			//}
+			bagCount, err := strconv.Atoi(string(bag[0]))
+			if err != nil {
+				return 0, err
+			}
 			bagColor := strings.TrimSpace(string(bag[2:]))
 
-			bag, ok := bags[bagColor]
-			if ok {
-				bag.within = append(bag.within, subjectBag)
-				fmt.Printf("appending to bag: %v %v\n", bag, subjectBag)
-				//bag.within[bagCount] = subjectBag
-				//subjectBag.bags[bagCount] = bag
-			} else {
-				bag = &Bag{color: bagColor, within: []*Bag{subjectBag}}
-				bags[bagColor] = bag
-
-				fmt.Printf("new bag: %v %v\n", bag, subjectBag)
-				//bag.within[bagCount] = subjectBag
+			_, ok := bags[bagColor]
+			if !ok {
+				bags[bagColor] = NewBag(bagColor)
 			}
+			bag := bags[bagColor]
+			bag.within = append(bag.within, subjectBag)
+			subjectBag.contains = append(subjectBag.contains, bag)
+			subjectBag.rules[bagColor] = bagCount
 		}
 	}
-	//fmt.Println(bags["shiny gold"])
-	//fmt.Println(bags["bright white"])
-	fmt.Println()
-	traveledBags := map[string]int{}
 
-	RecursiveCount(bags["shiny gold"], traveledBags)
-	return len(traveledBags), nil
+	if runPartTwo {
+		return CountContainedBags(bags["shiny gold"], 0), nil
+	}
+
+	return len(CountWithinBags(bags["shiny gold"], map[string]int{})), nil
+}
+func CountContainedBags(bag *Bag, i int) int {
+	if len(bag.contains) == 0 {
+		return i
+	}
+
+	for _, containedBag := range bag.contains {
+		i += bag.rules[containedBag.color]
+		for j := 0; j < bag.rules[containedBag.color]; j++ {
+			i = CountContainedBags(containedBag, i)
+		}
+	}
+	return i
 }
 
-func RecursiveCount(bag *Bag, traveled map[string]int) map[string]int {
+func CountWithinBags(bag *Bag, traveled map[string]int) map[string]int {
 	if len(bag.within) == 0 {
 		return traveled
 	}
 
 	for _, bagWithin := range bag.within {
-		traveled[bagWithin.color] = 0
-		RecursiveCount(bagWithin, traveled)
+		// Don't care about the value here, just don't want to double count the same color
+		traveled[bagWithin.color] += bagWithin.rules[bag.color]
+		CountWithinBags(bagWithin, traveled)
 	}
 	return traveled
 }
